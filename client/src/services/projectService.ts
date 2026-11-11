@@ -5,8 +5,12 @@ interface ProjectsApiResponse {
   data: Project[];
 }
 
+// Define the base URL for the API, using an environment variable if available
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+
 export async function getProjects(): Promise<Project[]> {
-  const response = await fetch("/api/projects");
+  //   const response = await fetch("/api/projects");
+  const response = await fetch(`${API_BASE_URL}/projects`);
 
   if (!response.ok) {
     throw new Error(`HTTP error! Status: ${response.status}`);
