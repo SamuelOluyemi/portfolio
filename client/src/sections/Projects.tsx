@@ -1,4 +1,4 @@
-import type { Project } from "../types/project";
+import type { Project } from "../types/projects";
 import ProjectCard from "../components/ProjectCard";
 
 interface ProjectsProps {

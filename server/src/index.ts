@@ -1,6 +1,16 @@
 import express from "express";
 
+// CORS middleware
+import cors from "cors";
+
 const app = express();
+
+// cors configuration
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL || "http://localhost:5173", // Allow requests from the client URL or localhost
+    })
+)
 
 const PORT = process.env.PORT || 3001;
 
@@ -32,7 +42,7 @@ const projects = [
       "TailwindCSS",
     ],
     category: "Full Stack Development",
-    githubUrl: "",
+    githubUrl: "https://github.com/Pill4rs",
     liveDemoUrl: "",
     imageUrl: "",
   },
