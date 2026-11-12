@@ -19,8 +19,13 @@ import {
   type JourneyInput,
 } from "../services/journeyService";
 
+import { getMessages } from "../services/messageService";
+
+import MessagesManager from "../components/admin/MessagesManager";
+
 import type { Project } from "../types/projects";
 import type { JourneyMilestone } from "../types/journey";
+import type { ContactMessage } from "../types/messages";
 
 const emptyProject: ProjectInput = {
   title: "",
@@ -48,6 +53,7 @@ function AdminDashboard() {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [milestones, setMilestones] = useState<JourneyMilestone[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
 
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -64,6 +70,10 @@ function AdminDashboard() {
     null,
   );
   const [journeyForm, setJourneyForm] = useState<JourneyInput>(emptyMilestone);
+
+  // =========================================
+  // INITIALIZE DASHBOARD
+  // =========================================
 
   useEffect(() => {
     let active = true;
@@ -102,6 +112,18 @@ function AdminDashboard() {
         } catch {
           if (active) {
             setError("Unable to load journey milestones. Please refresh.");
+          }
+        }
+
+        try {
+          const messageData = await getMessages();
+
+          if (active) {
+            setMessages(messageData);
+          }
+        } catch {
+          if (active) {
+            setError("Unable to load messages. Please refresh the page.");
           }
         }
       } catch {
@@ -310,6 +332,10 @@ function AdminDashboard() {
     }
   };
 
+  // =========================================
+  // LOADING AND AUTH CHECK
+  // =========================================
+
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
@@ -321,6 +347,10 @@ function AdminDashboard() {
   if (adminId === null) {
     return null;
   }
+
+  // =========================================
+  // DASHBOARD UI
+  // =========================================
 
   return (
     <main className="min-h-screen bg-slate-950 p-6 text-slate-100 md:p-8">
@@ -766,15 +796,13 @@ function AdminDashboard() {
         </section>
 
         {/* =====================================
-            MESSAGES PLACEHOLDER
+            MESSAGES MANAGEMENT
         ===================================== */}
 
-        <section className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-          <h2 className="text-xl font-semibold">Messages</h2>
-          <p className="mt-2 text-sm text-slate-400">
-            Review contact form submissions. Message management is coming next.
-          </p>
-        </section>
+        <MessagesManager
+          initialMessages={messages}
+          onMessagesChange={setMessages}
+        />
       </div>
     </main>
   );
