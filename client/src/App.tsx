@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
 
 import "./App.css";
 
@@ -16,7 +17,10 @@ import Journey from "./sections/Journey";
 import Contact from "./sections/Contact";
 import Footer from "./sections/Footer";
 
-function App() {
+import AdminLogin from "./pages/AdminLogin"; // Import the AdminLogin component
+import AdminDashboard from "./pages/AdminDashboard"; // Import the AdminDashboard component
+
+function PublicPortfolio() {
   //const [count, setCount] = useState(0)
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +33,7 @@ function App() {
       try {
         // const response = await fetch('/api/projects')
         const data = await getProjects();
+        console.log("Public portfolio projects:", data);
 
         // if (!response.ok) {
         //   throw new Error(`HTTP error! status: ${response.status}`)
@@ -87,6 +92,16 @@ function App() {
       {/* Footer */}
       <Footer />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<PublicPortfolio />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+    </Routes>
   );
 }
 
