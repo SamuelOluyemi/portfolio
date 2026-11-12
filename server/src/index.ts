@@ -6,11 +6,26 @@ import cors from "cors";
 const app = express();
 
 // cors configuration
+// app.use(
+//     cors({
+//         origin: process.env.CLIENT_URL || "http://localhost:5173", // Allow requests from the client URL or localhost
+//     })
+// )
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim());
+
 app.use(
-    cors({
-        origin: process.env.CLIENT_URL || "http://localhost:5173", // Allow requests from the client URL or localhost
-    })
-)
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
+  }),
+);
 
 const PORT = process.env.PORT || 3001;
 
