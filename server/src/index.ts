@@ -10,13 +10,22 @@ import projectsRouter from "./routes/projects.js";
 import journeyRouter from "./routes/journey.js";
 import contactRouter from "./routes/contact.js";
 
+import authRouter from "./routes/auth.js"; // Import the auth router
+
 // Import helmet for security headers
 import helmet from "helmet";
 // Limiter
-import { generalLimiter, contactLimiter } from "./middleware/rateLimiter.js";
+import {
+  generalLimiter,
+  contactLimiter,
+  loginLimiter,
+} from "./middleware/rateLimiter.js";
 
 // Import the error handler middleware
 import { errorHandler } from "./middleware/errorHandler.js";
+
+// Import the session middleware
+import { sessionMiddleware } from "./config/session.js";
 
 const app = express();
 app.set("trust proxy", 1); // Trust the first proxy in front of the server (if any) for rate limiting and security headers
@@ -40,6 +49,7 @@ app.use(
         callback(null, false);
       }
     },
+    credentials: true, // Allow cookies to be sent with requests
   }),
 );
 
@@ -47,9 +57,11 @@ const PORT = process.env.PORT || 3001;
 
 // security headers using helmet (configures security-related HTTP headers for incoming requests)
 app.use(helmet());
+app.use(sessionMiddleware); // Use the session middleware for managing user sessions
 
 app.use("/api", generalLimiter); // Apply general rate limiting to all API routes
 app.use("/api/contact", contactLimiter); // Apply contact-specific rate limiting
+app.use("/api/auth/login", loginLimiter); // Apply login-specific rate limiting
 
 // Middleware to parse JSON request bodies
 app.use(express.json({ limit: "10kb" })); // Limit request body size to 10kb
@@ -63,38 +75,7 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-// Projects and Endpoint
-// const projects = [
-//   {
-//     id: 1,
-//     title: "Marketing & Advertising Platform",
-//     description:
-//       "A full-stack web application built to support over 5,000 users, featuring a React frontend and a Node.js backend.",
-//     technologies: [
-//       "React",
-//       "Node.js",
-//       "JavaScript",
-//       "Express",
-//       "MongoDB",
-//       "TailwindCSS",
-//     ],
-//     category: "Full Stack Development",
-//     githubUrl: "https://github.com/Pill4rs",
-//     liveDemoUrl: "",
-//     imageUrl: "",
-//   },
-//   {
-//     id: 2,
-//     title: "Tech Blog Application",
-//     description:
-//       "An interactive technology blog featuring user registration, authentication, article publishing, comments, and admin functionality.",
-//     technologies: ["Web Development", "Authentication", "CRUD"],
-//     category: "Full-Stack Development",
-//     githubUrl: "https://github.com/SamuelOluyemi/Tech-Blog-World.git",
-//     liveDemoUrl: "",
-//     imageUrl: "/images/tech-blog-home.png",
-//   },
-// ];
+// Projects and Endpoint: moved to separate router file for better organization and maintainability
 
 // replaced the following line with the projects router
 // app.get("/api/projects", (_req, res) => {
@@ -112,6 +93,9 @@ app.use("/api/journey", journeyRouter);
 
 // Contact API
 app.use("/api/contact", contactRouter);
+
+// Auth API
+app.use("/api/auth", authRouter); // Use the auth router for authentication-related routes
 
 app.use(errorHandler); // Use the error handler middleware
 

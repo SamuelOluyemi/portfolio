@@ -27,3 +27,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Authentication and session files
+cookies.txt
+*.cookies
