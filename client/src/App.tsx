@@ -37,6 +37,8 @@ function App() {
         // const result = await response.json()
         // setProjects(result.data)
         setProjects(data);
+        console.log("Projects received from API:", data);
+        console.log("Number of projects:", data.length);
         setApiStatus("Connected");
       } catch (error) {
         console.error("Failed to fetch projects:", error);
@@ -53,6 +55,11 @@ function App() {
   }, []);
 
   // moved skills array from App.tsx to Skills.tsx
+
+  // debug
+  console.log("Projects state:", projects);
+  console.log("Loading state:", loading);
+  console.log("API status:", apiStatus);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
