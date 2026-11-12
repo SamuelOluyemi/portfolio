@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { checkAuth, logoutAdmin } from "../services/authService";
+
 import {
   createProject,
   deleteProject,
@@ -9,7 +10,17 @@ import {
   updateProject,
   type ProjectInput,
 } from "../services/projectService";
+
+import {
+  createMilestone,
+  deleteMilestone,
+  getJourney,
+  updateMilestone,
+  type JourneyInput,
+} from "../services/journeyService";
+
 import type { Project } from "../types/projects";
+import type { JourneyMilestone } from "../types/journey";
 
 const emptyProject: ProjectInput = {
   title: "",
@@ -21,19 +32,38 @@ const emptyProject: ProjectInput = {
   imageUrl: "",
 };
 
+const emptyMilestone: JourneyInput = {
+  organization: "",
+  title: "",
+  description: "",
+  dateLabel: "",
+  displayOrder: 0,
+};
+
 function AdminDashboard() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [adminId, setAdminId] = useState<number | null>(null);
+
   const [projects, setProjects] = useState<Project[]>([]);
+  const [milestones, setMilestones] = useState<JourneyMilestone[]>([]);
+
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // Project form state
   const [showForm, setShowForm] = useState(false);
   const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
   const [formData, setFormData] = useState<ProjectInput>(emptyProject);
   const [technologiesInput, setTechnologiesInput] = useState("");
+
+  // Journey form state
+  const [showJourneyForm, setShowJourneyForm] = useState(false);
+  const [editingMilestoneId, setEditingMilestoneId] = useState<number | null>(
+    null,
+  );
+  const [journeyForm, setJourneyForm] = useState<JourneyInput>(emptyMilestone);
 
   useEffect(() => {
     let active = true;
@@ -62,6 +92,18 @@ function AdminDashboard() {
             setError("Unable to load projects. Please refresh the page.");
           }
         }
+
+        try {
+          const journeyData = await getJourney();
+
+          if (active) {
+            setMilestones(journeyData);
+          }
+        } catch {
+          if (active) {
+            setError("Unable to load journey milestones. Please refresh.");
+          }
+        }
       } catch {
         if (active) {
           navigate("/admin/login", { replace: true });
@@ -79,6 +121,10 @@ function AdminDashboard() {
       active = false;
     };
   }, [navigate]);
+
+  // =========================================
+  // PROJECT MANAGEMENT
+  // =========================================
 
   const resetForm = () => {
     setFormData(emptyProject);
@@ -167,6 +213,92 @@ function AdminDashboard() {
     }
   };
 
+  // =========================================
+  // JOURNEY MANAGEMENT
+  // =========================================
+
+  const resetJourneyForm = () => {
+    setJourneyForm(emptyMilestone);
+    setEditingMilestoneId(null);
+    setShowJourneyForm(false);
+    setError("");
+  };
+
+  const handleJourneyEdit = (milestone: JourneyMilestone) => {
+    setEditingMilestoneId(milestone.id);
+
+    setJourneyForm({
+      organization: milestone.organization,
+      title: milestone.title,
+      description: milestone.description,
+      dateLabel: milestone.dateLabel || "",
+      displayOrder: milestone.displayOrder,
+    });
+
+    setShowJourneyForm(true);
+    setError("");
+  };
+
+  const handleJourneySubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+    setError("");
+    setSaving(true);
+
+    try {
+      if (editingMilestoneId !== null) {
+        const updated = await updateMilestone(editingMilestoneId, journeyForm);
+
+        setMilestones((current) =>
+          current
+            .map((item) => (item.id === updated.id ? updated : item))
+            .sort((a, b) => a.displayOrder - b.displayOrder || a.id - b.id),
+        );
+      } else {
+        const created = await createMilestone(journeyForm);
+
+        setMilestones((current) =>
+          [...current, created].sort(
+            (a, b) => a.displayOrder - b.displayOrder || a.id - b.id,
+          ),
+        );
+      }
+
+      resetJourneyForm();
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Unable to save milestone.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleJourneyDelete = async (id: number) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this milestone?",
+    );
+
+    if (!confirmed) return;
+
+    setError("");
+
+    try {
+      await deleteMilestone(id);
+
+      setMilestones((current) => current.filter((item) => item.id !== id));
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Unable to delete milestone.",
+      );
+    }
+  };
+
+  // =========================================
+  // AUTHENTICATION
+  // =========================================
+
   const handleLogout = async () => {
     setError("");
 
@@ -217,6 +349,10 @@ function AdminDashboard() {
             {error}
           </p>
         )}
+
+        {/* =====================================
+            PROJECT MANAGEMENT
+        ===================================== */}
 
         <section className="mb-10">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -438,20 +574,206 @@ function AdminDashboard() {
           )}
         </section>
 
-        <section className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-            <h2 className="text-xl font-semibold">Journey</h2>
-            <p className="mt-2 text-sm text-slate-400">
-              Manage your career milestones.
-            </p>
+        {/* =====================================
+            JOURNEY MANAGEMENT
+        ===================================== */}
+
+        <section className="mb-10">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold">Manage Journey</h2>
+              <p className="mt-1 text-slate-400">
+                Add, edit, reorder, and remove career milestones.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                resetJourneyForm();
+                setShowJourneyForm(true);
+              }}
+              className="rounded-lg bg-blue-600 px-5 py-3 font-semibold hover:bg-blue-500"
+            >
+              Add Milestone
+            </button>
           </div>
 
-          <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-            <h2 className="text-xl font-semibold">Messages</h2>
-            <p className="mt-2 text-sm text-slate-400">
-              Review contact form submissions.
-            </p>
+          {showJourneyForm && (
+            <form
+              onSubmit={handleJourneySubmit}
+              className="mb-8 space-y-4 rounded-xl border border-slate-800 bg-slate-900 p-6"
+            >
+              <h3 className="text-xl font-semibold">
+                {editingMilestoneId !== null
+                  ? "Edit Milestone"
+                  : "New Milestone"}
+              </h3>
+
+              <div>
+                <label className="mb-2 block text-sm">Organization *</label>
+                <input
+                  required
+                  maxLength={150}
+                  value={journeyForm.organization}
+                  onChange={(event) =>
+                    setJourneyForm({
+                      ...journeyForm,
+                      organization: event.target.value,
+                    })
+                  }
+                  placeholder="e.g. Athabasca University"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm">Milestone title *</label>
+                <input
+                  required
+                  maxLength={200}
+                  value={journeyForm.title}
+                  onChange={(event) =>
+                    setJourneyForm({
+                      ...journeyForm,
+                      title: event.target.value,
+                    })
+                  }
+                  placeholder="e.g. Computer Science Foundations"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm">Description *</label>
+                <textarea
+                  required
+                  rows={4}
+                  value={journeyForm.description}
+                  onChange={(event) =>
+                    setJourneyForm({
+                      ...journeyForm,
+                      description: event.target.value,
+                    })
+                  }
+                  placeholder="Describe this milestone..."
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm">Date label</label>
+                <input
+                  maxLength={100}
+                  value={journeyForm.dateLabel || ""}
+                  onChange={(event) =>
+                    setJourneyForm({
+                      ...journeyForm,
+                      dateLabel: event.target.value,
+                    })
+                  }
+                  placeholder="e.g. 2026 or Present"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm">Display order</label>
+                <input
+                  type="number"
+                  min={0}
+                  required
+                  value={journeyForm.displayOrder}
+                  onChange={(event) =>
+                    setJourneyForm({
+                      ...journeyForm,
+                      displayOrder: Number(event.target.value),
+                    })
+                  }
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="rounded-lg bg-blue-600 px-5 py-3 font-semibold hover:bg-blue-500 disabled:opacity-50"
+                >
+                  {saving ? "Saving..." : "Save Milestone"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={resetJourneyForm}
+                  className="rounded-lg bg-slate-700 px-5 py-3 font-semibold hover:bg-slate-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+
+          <div className="grid gap-5 md:grid-cols-2">
+            {milestones.map((milestone) => (
+              <article
+                key={milestone.id}
+                className="rounded-xl border border-slate-800 bg-slate-900 p-6"
+              >
+                <p className="text-sm text-blue-400">
+                  {milestone.organization}
+                </p>
+
+                <h3 className="mt-2 text-xl font-semibold">
+                  {milestone.title}
+                </h3>
+
+                {milestone.dateLabel && (
+                  <p className="mt-1 text-sm text-slate-500">
+                    {milestone.dateLabel}
+                  </p>
+                )}
+
+                <p className="mt-3 text-slate-300">{milestone.description}</p>
+
+                <p className="mt-3 text-xs text-slate-500">
+                  Display order: {milestone.displayOrder}
+                </p>
+
+                <div className="mt-5 flex gap-3">
+                  <button
+                    onClick={() => handleJourneyEdit(milestone)}
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold hover:bg-blue-500"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => handleJourneyDelete(milestone.id)}
+                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold hover:bg-red-500"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </article>
+            ))}
           </div>
+
+          {milestones.length === 0 && (
+            <p className="rounded-xl border border-slate-800 bg-slate-900 p-6 text-slate-400">
+              No milestones found. Add your first milestone above.
+            </p>
+          )}
+        </section>
+
+        {/* =====================================
+            MESSAGES PLACEHOLDER
+        ===================================== */}
+
+        <section className="rounded-xl border border-slate-800 bg-slate-900 p-6">
+          <h2 className="text-xl font-semibold">Messages</h2>
+          <p className="mt-2 text-sm text-slate-400">
+            Review contact form submissions. Message management is coming next.
+          </p>
         </section>
       </div>
     </main>
