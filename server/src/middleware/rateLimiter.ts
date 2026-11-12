@@ -1,30 +1,34 @@
 import rateLimit from "express-rate-limit";
 
-// General rate limiter for all API routes
+// General rate limiter for public API requests.
+// Authenticated admins are exempt.
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 100,
   standardHeaders: "draft-8",
   legacyHeaders: false,
+  skip: (req) => Boolean(req.session?.adminId),
   message: {
     success: false,
     message: "Too many requests. Please try again later.",
   },
 });
 
-// Rate limiter specifically for the contact form submission route
+// Rate limiter for public contact form submissions.
+// Authenticated admins are exempt.
 export const contactLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 5,
   standardHeaders: "draft-8",
   legacyHeaders: false,
+  skip: (req) => Boolean(req.session?.adminId),
   message: {
     success: false,
     message: "Too many contact submissions. Please try again later.",
   },
 });
 
-// Additional rate limiters can be defined here for other routes as needed (authentication especially)
+// Login rate limiter remains active for everyone.
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 5,

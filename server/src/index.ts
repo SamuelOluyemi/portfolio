@@ -1,41 +1,28 @@
-import "dotenv/config"; // Load environment variables from .env file
+import "dotenv/config";
 import express from "express";
-
-// CORS middleware
 import cors from "cors";
-import { connectDatabase } from "./config/database.js";
+import helmet from "helmet";
 
-// Import the projects router
+import { connectDatabase } from "./config/database.js";
+import { sessionMiddleware } from "./config/session.js";
+
 import projectsRouter from "./routes/projects.js";
 import journeyRouter from "./routes/journey.js";
 import contactRouter from "./routes/contact.js";
+import authRouter from "./routes/auth.js";
 
-import authRouter from "./routes/auth.js"; // Import the auth router
-
-// Import helmet for security headers
-import helmet from "helmet";
-// Limiter
 import {
   generalLimiter,
   contactLimiter,
   loginLimiter,
 } from "./middleware/rateLimiter.js";
 
-// Import the error handler middleware
 import { errorHandler } from "./middleware/errorHandler.js";
 
-// Import the session middleware
-import { sessionMiddleware } from "./config/session.js";
-
 const app = express();
-app.set("trust proxy", 1); // Trust the first proxy in front of the server (if any) for rate limiting and security headers
 
-// cors configuration
-// app.use(
-//     cors({
-//         origin: process.env.CLIENT_URL || "http://localhost:5173", // Allow requests from the client URL or localhost
-//     })
-// )
+app.set("trust proxy", 1);
+
 const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
   .split(",")
   .map((origin) => origin.trim());
@@ -49,24 +36,33 @@ app.use(
         callback(null, false);
       }
     },
-    credentials: true, // Allow cookies to be sent with requests
+    credentials: true,
   }),
 );
 
 const PORT = process.env.PORT || 3001;
 
-// security headers using helmet (configures security-related HTTP headers for incoming requests)
+// Security headers
 app.use(helmet());
-app.use(sessionMiddleware); // Use the session middleware for managing user sessions
 
-app.use("/api", generalLimiter); // Apply general rate limiting to all API routes
-app.use("/api/contact", contactLimiter); // Apply contact-specific rate limiting
-app.use("/api/auth/login", loginLimiter); // Apply login-specific rate limiting
+// Session must run before rate limiters so they can identify admins.
+app.use(sessionMiddleware);
 
-// Middleware to parse JSON request bodies
-app.use(express.json({ limit: "10kb" })); // Limit request body size to 10kb
+// General API rate limiting.
+// Authenticated admins are skipped by the limiter.
+app.use("/api", generalLimiter);
 
-// Health check endpoint
+// Contact form rate limiting.
+// Apply only to public POST submissions, not admin GET/PATCH/DELETE.
+app.post("/api/contact", contactLimiter);
+
+// Login rate limiting remains active.
+app.use("/api/auth/login", loginLimiter);
+
+// Parse JSON request bodies
+app.use(express.json({ limit: "10kb" }));
+
+// Health check
 app.get("/api/health", (_req, res) => {
   res.status(200).json({
     success: true,
@@ -75,36 +71,16 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-// Projects and Endpoint: moved to separate router file for better organization and maintainability
-
-// replaced the following line with the projects router
-// app.get("/api/projects", (_req, res) => {
-//   res.status(200).json({
-//     success: true,
-//     data: projects,
-//   });
-// });
-
-// Projects API
+// API routes
 app.use("/api/projects", projectsRouter);
-
-// Journey API
 app.use("/api/journey", journeyRouter);
-
-// Contact API
 app.use("/api/contact", contactRouter);
+app.use("/api/auth", authRouter);
 
-// Auth API
-app.use("/api/auth", authRouter); // Use the auth router for authentication-related routes
+// Global error handler
+app.use(errorHandler);
 
-app.use(errorHandler); // Use the error handler middleware
-
-// Start the server: Replace the following line with the database connection logic
-// app.listen(PORT, () => {
-//   console.log(`Server is running on http://localhost:${PORT}`);
-// });
-
-// Start the server only after connecting to PostgreSQL
+// Start server after database connection
 async function startServer(): Promise<void> {
   try {
     await connectDatabase();
