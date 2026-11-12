@@ -105,7 +105,7 @@ Projects API: Retrieve my projects dynamically.
 Contact API: Allow visitors to send me messages.
 Journey API: Retrieve my learning milestones and achievements.
 Admin authentication: Allow me to sign in and manage my portfolio content.
-Security: Inout validation, rate limiting, secure authentication, and appropriate security headers.
+Security: Input validation, rate limiting, secure authentication, and appropriate security headers.
 
 We will implement the authentication when we introduce the admin dashboard.
 
@@ -140,8 +140,8 @@ We will implement the authentication when we introduce the admin dashboard.
     - tsconfig.json
 
   - .gitignore
-  - package.json            #root scripts
-  - package-lock.json       # root dependencies
+  - package.json #root scripts
+  - package-lock.json # root dependencies
   - README.md
 
 ### Architectural Decision
@@ -169,3 +169,17 @@ We implement:
 - Authentication and application security.
 - Git branching and version control.
 - Deployment and environment variables.
+
+## What we do next
+
+We'll continue in small, testable steps, just as we've been doing:
+
+1. Finish committing and pushing the debugging cleanup.
+2. Review the existing backend before changing anything.
+3. Introduce PostgreSQL and connect it to the backend.
+4. Move project data into the database.
+5. Build the Journey API.
+6. Build the Contact API, including validation and spam protection.
+7. Strengthen backend security.
+8. Build the admin dashboard and authentication.
+9. Complete production deployment and testing.
