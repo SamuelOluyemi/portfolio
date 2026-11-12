@@ -1,185 +1,309 @@
-# React + TypeScript + Vite
+# Personal Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack personal developer portfolio built with **React, TypeScript, Node.js, Express, and PostgreSQL**. The application showcases projects, professional experience, technical skills, and contact information, with a secure admin dashboard for managing portfolio content.
 
-Currently, two official plugins are available:
+**Live application:** [View Portfolio](https://portfolio-orcin-omega-2bzem986qs.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Backend API:** [Portfolio API](https://portfolio-api-frh4.onrender.com/api)
 
-## React Compiler
+**Repository:** [GitHub – SamuelOluyemi/portfolio](https://github.com/SamuelOluyemi/portfolio)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Public Portfolio
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+- Responsive portfolio interface.
+- Project showcase with project descriptions, technologies, categories, and links.
+- Professional journey and milestone timeline.
+- Contact form for visitor inquiries.
+- Dynamic content retrieved from the backend API.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Admin Dashboard
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+- Secure administrator login and session management.
+- Create, read, update, and delete portfolio projects.
+- Create, edit, and delete professional journey milestones.
+- View and manage contact messages.
+- Mark messages as read or unread.
+- Archive, restore, and delete messages.
+- Protected administrative API endpoints.
+
+### Security
+
+- Session-based administrator authentication.
+- Protected routes and API operations.
+- Password-based administrator login.
+- API rate limiting for public requests.
+- Separate rate limiting for contact form submissions.
+- Login attempt rate limiting.
+- Authenticated administrators are exempt from public API rate limits.
+- CORS configuration and Helmet security headers.
+- Request validation and JSON request-size limits.
+
+---
+
+## Technology Stack
+
+| Area              | Technologies            |
+| ----------------- | ----------------------- |
+| Frontend          | React, TypeScript, Vite |
+| Styling           | Tailwind CSS            |
+| Backend           | Node.js, Express.js     |
+| Language          | TypeScript              |
+| Database          | PostgreSQL              |
+| Authentication    | Express sessions        |
+| Validation        | Zod                     |
+| API communication | REST API                |
+| Frontend hosting  | Vercel                  |
+| Backend hosting   | Render                  |
+| Database hosting  | Neon PostgreSQL         |
+| Version control   | Git and GitHub          |
+
+---
+
+## Project Structure
+
+```text
+portfolio/
+│
+├── client/
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       │   └── admin/
+│       │       └── MessagesManager.tsx
+│       ├── pages/
+│       │   └── AdminDashboard.tsx
+│       ├── services/
+│       │   ├── contactService.ts
+│       │   ├── journeyService.ts
+│       │   └── messageService.ts
+│       └── types/
+│
+├── server/
+│   ├── migrations/
+│   └── src/
+│       ├── config/
+│       ├── middleware/
+│       ├── routes/
+│       ├── validators/
+│       └── index.ts
+│
+├── public/
+├── eslint.config.js
+├── package.json
+└── README.md
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+## Getting Started
 
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+### Prerequisites
+
+Make sure you have the following installed:
+
+- Node.js
+- npm
+- PostgreSQL
+- Git
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/SamuelOluyemi/portfolio.git
 ```
 
-# Start
+Navigate into the project:
 
-## Start the dev server
-
-```npm run dev
-
+```bash
+cd portfolio
 ```
 
-## Tech Stack
+### 2. Install dependencies
 
-- React [component-based user interface]
-- TypeScript [type safety, interfaces, and maintainable code]
-- Tailwind CSS [utility-first styling and responsive design]
-- Node.js + Express [backend API and server-side functionality]
-- PostgreSQL [database for projects, messages and content]
-- Git + GitHub [version control and source code management]
-- Vercel + backend hosting [public deploymeny and always-available services]
+Install the frontend and backend dependencies:
 
-## App Structure
+```bash
+cd client
+npm install
+```
 
-Full-stack development, API design, database integration, authentication and security practices.
+Then:
 
-- FRONTEND - React + TypeScript + Tailwind CSS (What visitors see and itneract with)
-- through HTTP/ REST API
-- BACKEND - Node.js + Express + TypeScript (Business logic, validation, authentication and API endpoints)
-- DATABASE - PostgreSQL (Persistent application data)
+```bash
+cd ../server
+npm install
+```
 
-### BACKEND
+### 3. Configure environment variables
 
-Projects API: Retrieve my projects dynamically.
-Contact API: Allow visitors to send me messages.
-Journey API: Retrieve my learning milestones and achievements.
-Admin authentication: Allow me to sign in and manage my portfolio content.
-Security: Input validation, rate limiting, secure authentication, and appropriate security headers.
+Create the appropriate `.env` files in the frontend and backend directories.
 
-We will implement the authentication when we introduce the admin dashboard.
+**Frontend (`client/.env`):**
 
-### Project Structure
+```env
+VITE_API_URL=/api
+```
 
-- portfolio/
-  - client/ #React FRONTEND
-    - src/
-      - components/
-      - pages/
-      - sections/
-      - services/
-      - types/
-      - App.tsx
-      - main.tsx
-    - .env.example
-    - index.html
-    - packages.json
-    - tsconfig.json
-    - vite.config.ts
+**Backend (`server/.env`):**
 
-  - server/ #Express BACKEND
-    - src/
-      - routes/
-      - controllers/
-      - middleware/
-      - servcies/
-      - config/
-      - index.ts
-    - .env.example
-    - package.json
-    - tsconfig.json
+Configure the PostgreSQL connection string, session secret, administrator credentials, and allowed frontend origin.
 
-  - .gitignore
-  - package.json #root scripts
-  - package-lock.json # root dependencies
-  - README.md
+The administrator credentials use:
 
-### Architectural Decision
+```env
+ADMIN_EMAIL=your-admin-email
+ADMIN_PASSWORD=your-secure-password
+```
 
-Our first release will have:
+Use the exact database and session variable names expected by `server/src/config/database.ts` and `server/src/config/session.ts`.
 
-- A complete React + TypeScript + Tailwind frontend.
-- A functioning Express API.
-- Projects retrieved through the API.
-- A working contact endpoint (we'll connect persistent storage and email delivery next).
-- A live deployment.
+Do not commit `.env` files or expose database credentials, session secrets, or administrator passwords.
 
-Then we'll introduce PostgreSQL and an admin dashboard.
+### 4. Set up the database
 
-### Implementation direction
+Create a PostgreSQL database and configure the backend to connect to it.
 
-We implement:
+The database migrations are located in:
 
-- React components and hooks.
-- TypeScript types, interfaces and generics.
-- Tailwind responsive styling.
-- REST API development.
-- Express middleware.
-- PostgreSQL and database design.
-- Authentication and application security.
-- Git branching and version control.
-- Deployment and environment variables.
+```text
+server/migrations/
+```
 
-## What we do next
+Run the migrations in their intended order to create the required portfolio tables and administrator data.
 
-We'll continue in small, testable steps, just as we've been doing:
+For production, the application uses Neon PostgreSQL.
 
-1. Finish committing and pushing the debugging cleanup.
-2. Review the existing backend before changing anything.
-3. Introduce PostgreSQL and connect it to the backend.
-4. Move project data into the database.
-5. Build the Journey API.
-6. Build the Contact API, including validation and spam protection.
-7. Strengthen backend security.
-8. Build the admin dashboard and authentication.
-9. Complete production deployment and testing.
+### 5. Start the application
+
+Start the backend:
+
+```bash
+cd server
+npm run dev
+```
+
+Start the frontend in another terminal:
+
+```bash
+cd client
+npm run dev
+```
+
+The Vite development server typically runs at:
+
+```text
+http://localhost:5173
+```
+
+The Express API runs at:
+
+```text
+http://localhost:3001
+```
+
+---
+
+## API Overview
+
+The backend exposes REST API endpoints for portfolio content and administrative operations.
+
+| Endpoint                  | Method | Description                 |
+| ------------------------- | ------ | --------------------------- |
+| `/api/health`             | GET    | API health check            |
+| `/api/projects`           | GET    | Retrieve projects           |
+| `/api/projects`           | POST   | Create a project            |
+| `/api/projects/:id`       | PUT    | Update a project            |
+| `/api/projects/:id`       | DELETE | Delete a project            |
+| `/api/journey`            | GET    | Retrieve journey milestones |
+| `/api/journey`            | POST   | Create a milestone          |
+| `/api/journey/:id`        | PUT    | Update a milestone          |
+| `/api/journey/:id`        | DELETE | Delete a milestone          |
+| `/api/contact`            | POST   | Submit a contact message    |
+| `/api/contact`            | GET    | Retrieve messages           |
+| `/api/contact/:id/status` | PATCH  | Update message status       |
+| `/api/contact/:id`        | DELETE | Delete a message            |
+| `/api/auth/login`         | POST   | Administrator login         |
+
+Administrative endpoints require an authenticated administrator session. Public endpoints are subject to the configured rate limits.
+
+---
+
+## Deployment
+
+The application is deployed using separate frontend and backend services.
+
+### Frontend – Vercel
+
+- Platform: Vercel
+- Root directory: `client`
+- Build command: `npm run build`
+- Output directory: `dist`
+- API configuration: `VITE_API_URL=/api`
+
+Live URL:
+
+https://portfolio-orcin-omega-2bzem986qs.vercel.app/
+
+### Backend – Render
+
+- Platform: Render
+- Root directory: `server`
+- Runtime: Node.js
+- Database: Neon PostgreSQL
+
+API URL:
+
+https://portfolio-api-frh4.onrender.com/api
+
+The backend's `CLIENT_URL` environment variable must allow the deployed frontend origin.
+
+---
+
+## Development and Build Checks
+
+Run the server TypeScript checks from the project root:
+
+```bash
+npm run typecheck:server
+```
+
+Build the frontend:
+
+```bash
+npm run build
+```
+
+Both checks should pass before changes are committed and deployed.
+
+---
+
+## Future Improvements
+
+Potential areas for future development include:
+
+- Automated database backups and tested recovery procedures.
+- Automated testing and continuous integration.
+- Improved application monitoring and logging.
+- Additional portfolio analytics.
+
+---
+
+## Author
+
+**Samuel Oluyemi**
+
+Software Developer | Full-Stack Development | Information Security and Privacy
+
+GitHub: [SamuelOluyemi](https://github.com/SamuelOluyemi)
+
+Portfolio: [View Website](https://portfolio-orcin-omega-2bzem986qs.vercel.app/)
+
+---
+
+## License
+
+This project is maintained as a personal portfolio. Please contact the author before reusing substantial portions of the code or content.
