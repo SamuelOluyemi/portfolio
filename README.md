@@ -246,7 +246,7 @@ The application is deployed using separate frontend and backend services.
 
 Live URL:
 
-https://portfolio-orcin-omega-2bzem986qs.vercel.app/
+https://samueloluyemi.vercel.app/
 
 ### Backend – Render
 
