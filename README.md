@@ -2,7 +2,7 @@
 
 A full-stack personal developer portfolio built with **React, TypeScript, Node.js, Express, and PostgreSQL**. The application showcases projects, professional experience, technical skills, and contact information, with a secure admin dashboard for managing portfolio content.
 
-**Live application:** [View Portfolio](https://portfolio-orcin-omega-2bzem986qs.vercel.app/)
+**Live application:** [View Portfolio](https://samueloluyemi.vercel.app/)
 
 **Backend API:** [Portfolio API](https://portfolio-api-frh4.onrender.com/api)
 
@@ -300,7 +300,7 @@ Software Developer | Full-Stack Development | Information Security and Privacy
 
 GitHub: [SamuelOluyemi](https://github.com/SamuelOluyemi)
 
-Portfolio: [View Website](https://portfolio-orcin-omega-2bzem986qs.vercel.app/)
+Portfolio: [View Website](https://samueloluyemi.vercel.app/)
 
 ---
 
