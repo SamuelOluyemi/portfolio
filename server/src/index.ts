@@ -62,6 +62,15 @@ app.use("/api/auth/login", loginLimiter);
 // Parse JSON request bodies
 app.use(express.json({ limit: "10kb" }));
 
+// Root route
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Welcome to the Portfolio API!",
+    status: "healthy",
+  });
+});
+
 // Health check
 app.get("/api/health", (_req, res) => {
   res.status(200).json({
