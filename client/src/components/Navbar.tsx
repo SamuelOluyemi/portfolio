@@ -2,7 +2,6 @@
   /* Navbar */
 }
 
-
 import { useState } from "react";
 
 function Navbar() {
@@ -21,7 +20,7 @@ function Navbar() {
           className="text-xl font-bold tracking-tight"
           onClick={closeMenu}
         >
-          Dev<span className="text-blue-500">Portfolio.</span>
+          Samuel Oluyemi's <span className="text-blue-500">Portfolio</span>
         </a>
 
         {/* Desktop Navigation */}
