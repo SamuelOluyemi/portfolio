@@ -519,12 +519,12 @@ function AdminDashboard() {
                 </label>
                 <input
                   id="imageUrl"
-                  type="url"
+                  type="text"
                   value={formData.imageUrl || ""}
                   onChange={(event) =>
                     setFormData({ ...formData, imageUrl: event.target.value })
                   }
-                  placeholder="https://example.com/image.png"
+                  placeholder="https://example.com/image.png or /images/project.png"
                   className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3"
                 />
               </div>

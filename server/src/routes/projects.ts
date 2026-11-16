@@ -12,7 +12,17 @@ const projectSchema = z.object({
   category: z.string().trim().min(1).max(100),
   githubUrl: z.string().trim().url().or(z.literal("")).optional(),
   liveDemoUrl: z.string().trim().url().or(z.literal("")).optional(),
-  imageUrl: z.string().trim().url().or(z.literal("")).optional(),
+  imageUrl: z
+    .string()
+    .trim()
+    .refine(
+      (value) =>
+        value === "" ||
+        /^https?:\/\/\S+$/i.test(value) ||
+        /^\/(?!\/)\S*$/.test(value),
+      "Enter a valid URL or local image path",
+    )
+    .optional(),
 });
 
 const projectFields = `
